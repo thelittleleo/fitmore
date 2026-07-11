@@ -25,6 +25,7 @@ export function Ring({
       <svg viewBox="0 0 140 140" width="140" height="140" role="img" aria-label={`${caption} ${display}`}>
         <circle cx="70" cy="70" r={R} fill="none" stroke="var(--surface-2)" strokeWidth={SW} />
         <circle
+          className="ring-arc"
           cx="70"
           cy="70"
           r={R}

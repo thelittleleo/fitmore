@@ -3,6 +3,7 @@ import type { PersonView } from "@/lib/types";
 import { MetricCharts } from "./components/MetricCharts";
 import { ScoreHero } from "./components/ScoreHero";
 import { RecoveryTrend } from "./components/RecoveryTrend";
+import { PersonTabs } from "./components/PersonTabs";
 
 // Read-only, server-rendered shell. Reads cached summaries + insights from
 // Postgres — it never calls Claude, so it's fast and free on every load. The
@@ -15,9 +16,7 @@ function PersonSection({ p }: { p: PersonView }) {
   return (
     <section className="person">
       <div className="person-head">
-        <span className={`status-dot status-${p.worstFlag}`} title={p.worstFlag} />
         <h2>{p.name}</h2>
-        {p.isCardiacPatient && <span className="badge cardiac">cardiac</span>}
         {p.periodEnd && <span className="period">week ending {p.periodEnd}</span>}
       </div>
 
@@ -106,9 +105,18 @@ export default async function Home() {
             </div>
           ) : (
             <>
-              {people.map((p) => (
-                <PersonSection key={p.id} p={p} />
-              ))}
+              <PersonTabs
+                tabs={people.map((p) => ({
+                  id: p.id,
+                  name: p.name,
+                  worstFlag: p.worstFlag,
+                  cardiac: p.isCardiacPatient,
+                }))}
+              >
+                {people.map((p) => (
+                  <PersonSection key={p.id} p={p} />
+                ))}
+              </PersonTabs>
 
               <div className="safety">
                 <span className="badge-text">Cardiac care</span>

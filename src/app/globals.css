@@ -108,6 +108,23 @@ main .wrap { padding-top: 30px; padding-bottom: 60px; }
 .status-watch { background: var(--warn); }
 .status-alert { background: var(--bad); }
 
+/* Person switcher */
+.person-tabs {
+  display: inline-flex; gap: 4px; margin: 0 0 22px;
+  background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 4px;
+}
+.person-tabs button {
+  display: inline-flex; align-items: center; gap: 8px; font: inherit; font-size: 14px; font-weight: 600;
+  color: var(--ink-soft); background: transparent; border: 0; padding: 7px 16px; border-radius: 7px; cursor: pointer;
+}
+.person-tabs button.active { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); }
+.person-tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.person-tabs .status-dot { width: 8px; height: 8px; }
+.tab-cardiac {
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--bad); background: var(--bad-wash); padding: 1px 5px; border-radius: 4px;
+}
+
 /* Score hero (WHOOP-style rings) */
 .hero { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
 .hero-metric {
@@ -127,6 +144,10 @@ main .wrap { padding-top: 30px; padding-bottom: 60px; }
   font-size: 10px; font-family: var(--font-mono); letter-spacing: 0.12em;
   text-transform: uppercase; color: var(--ink-faint);
 }
+/* Subtle fill-in on load (all rings share R=54 → circumference ~339). */
+@keyframes ringGrow { from { stroke-dashoffset: 340; } }
+.ring-arc { animation: ringGrow 0.9s ease-out; }
+@media (prefers-reduced-motion: reduce) { .ring-arc { animation: none; } }
 .hero-title { font-size: 14px; font-weight: 650; margin-top: 8px; }
 .hero-sub { font-size: 11.5px; color: var(--ink-faint); max-width: 24ch; }
 
