@@ -20,6 +20,9 @@
   --spark-watch: #cf9433;
   --spark-alert: #d6564f;
 
+  --strain: #2f6fed;
+  --sleep: #7c5cd6;
+
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
@@ -46,6 +49,9 @@
     --spark-normal: #2fd4bf;
     --spark-watch: #e0a45c;
     --spark-alert: #f0605c;
+
+    --strain: #6ea8ff;
+    --sleep: #a992f0;
   }
 }
 
@@ -101,6 +107,49 @@ main .wrap { padding-top: 30px; padding-bottom: 60px; }
 .status-normal { background: var(--good); }
 .status-watch { background: var(--warn); }
 .status-alert { background: var(--bad); }
+
+/* Score hero (WHOOP-style rings) */
+.hero { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+.hero-metric {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  padding: 16px 12px 15px; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(18, 33, 31, 0.05);
+}
+.ring { position: relative; width: 140px; height: 140px; }
+.ring-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+}
+.ring-value { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; line-height: 1; font-variant-numeric: tabular-nums; }
+.ring-value .ring-unit { font-size: 15px; font-weight: 600; margin-left: 1px; }
+.ring-cap {
+  font-size: 10px; font-family: var(--font-mono); letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--ink-faint);
+}
+.hero-title { font-size: 14px; font-weight: 650; margin-top: 8px; }
+.hero-sub { font-size: 11.5px; color: var(--ink-faint); max-width: 24ch; }
+
+/* Section titles + recovery trend card */
+.section-title {
+  font-size: 11px; font-family: var(--font-mono); letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--ink-faint); margin: 0 0 8px;
+}
+.vitals-title { margin-top: 22px; }
+.trend-card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  padding: 14px 14px 8px; margin-bottom: 16px;
+}
+.trend-card .section-title { margin-bottom: 4px; }
+
+/* Recovery-band colors inside the chart tooltip */
+.chart-tip .tip-flag.green { color: var(--good); }
+.chart-tip .tip-flag.yellow { color: var(--warn); }
+.chart-tip .tip-flag.red { color: var(--bad); }
+
+@media (max-width: 560px) {
+  .hero { grid-template-columns: 1fr; }
+}
 
 /* Insight card */
 .insight {

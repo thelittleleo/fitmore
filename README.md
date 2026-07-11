@@ -16,15 +16,21 @@ for me and my mother (a post-bypass cardiac patient).
 
 ---
 
-## What's here (the M1 vertical slice)
+## What's here
 
 ```
-Mock adapter → Postgres → deterministic engine → insight (Claude or free) → web dashboard
+Mock adapter → Postgres → baselines + WHOOP-style scores → insight (Claude or free) → dashboard
 ```
 
 - **Deterministic engine** (`src/engine/summarize.ts`) — trailing baselines,
   z-scores, direction-aware flags (`normal` / `watch` / `alert`) and trends.
   This is the exact, cheap, **$0** part. It runs with no AI at all.
+- **Scores engine** (`src/engine/scores.ts`) — WHOOP-style daily **Recovery %**
+  (our own composite of HRV, resting HR, sleep and skin temp vs personal
+  baseline), **Day Strain** (0–21 cardiovascular load), and **Sleep
+  Performance** (% of need). Transparent formulas, not WHOOP's proprietary ones.
+- **Dashboard** — WHOOP-style: three big Recovery / Strain / Sleep rings, a
+  colored recovery-history chart, then interactive per-metric "Vitals" charts.
 - **Insight engine** (`src/engine/insight.ts`) — reads a compact *summary* (not
   raw data), writes a short narrative, and **caches it** to the DB.
   - No `ANTHROPIC_API_KEY` set → a rules-based narrative is generated for free.
@@ -81,6 +87,7 @@ which engine produced each insight (`Claude · <model>` or `rules · free`).
 | `npm run db:migrate`| Apply `db/schema.sql` |
 | `npm run seed`      | Ingest mock data (`MOCK_DAYS`, default 35) |
 | `npm run summarize` | Compute baselines + flags |
+| `npm run scores`    | Compute recovery / strain / sleep scores |
 | `npm run insight`   | Generate/cache insights |
 | `npm run pipeline`  | All of the above, in order |
 | `npm run dev`       | Next.js dev server |
@@ -102,9 +109,10 @@ docs/                      architecture (md + html)
 ## Roadmap
 
 - **M1 (done)** — mock → pipeline → dashboard, end to end.
-- **M2** — richer charts; more metrics.
-- **M3** — scheduled Claude insight generation.
-- **M4** — near-real-time webhooks + anomaly alerts.
+- **M2 (done)** — interactive Recharts (baseline band, flagged points, range toggle).
+- **M3 (done)** — WHOOP-style Recovery / Strain / Sleep scores + rings + recovery history.
+- **M4** — behavior journal + Claude "what moves your recovery" correlations; scheduled insights.
+- **M5** — near-real-time webhooks + anomaly alerts.
 - **M5** — real Google Health API adapter for the Fitbit Air; later a Huawei
   Watch D2 adapter for validated blood pressure (for Mum); open it up to others.
 

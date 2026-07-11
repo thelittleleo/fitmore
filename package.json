@@ -9,6 +9,7 @@
     "db:migrate": "tsx src/scripts/migrate.ts",
     "seed": "tsx src/scripts/seed.ts",
     "summarize": "tsx src/scripts/run-summaries.ts",
+    "scores": "tsx src/scripts/run-scores.ts",
     "insight": "tsx src/scripts/run-insights.ts",
     "pipeline": "tsx src/scripts/pipeline.ts",
     "dev": "next dev",

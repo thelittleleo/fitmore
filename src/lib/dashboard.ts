@@ -1,6 +1,14 @@
 import { query } from "./db";
 import { METRICS, type MetricKey, type Flag, type Trend } from "./metrics";
-import type { ChartPoint, InsightPayload, MetricView, PersonView } from "./types";
+import type {
+  ChartPoint,
+  InsightPayload,
+  MetricView,
+  PersonView,
+  RecoveryBand,
+  ScoreDay,
+  ScoresView,
+} from "./types";
 
 export type { MetricView, PersonView } from "./types";
 
@@ -73,6 +81,32 @@ export async function getDashboard(): Promise<PersonView[]> {
       });
     }
 
+    const scoreRows = await query<{
+      day: string;
+      recovery: number | null;
+      recovery_band: RecoveryBand | null;
+      strain: number;
+      sleep_performance: number;
+      sleep_need: number | null;
+      sleep_minutes: number | null;
+    }>(
+      `select day::text, recovery, recovery_band, strain, sleep_performance, sleep_need, sleep_minutes
+       from daily_scores where person_id = $1 order by day asc`,
+      [p.id],
+    );
+    const history: ScoreDay[] = scoreRows
+      .filter((r) => r.recovery !== null)
+      .map((r) => ({
+        day: r.day,
+        recovery: r.recovery === null ? null : Number(r.recovery),
+        band: r.recovery_band,
+        strain: Number(r.strain),
+        sleepPerformance: Number(r.sleep_performance),
+        sleepNeed: r.sleep_need === null ? null : Number(r.sleep_need),
+        sleepMinutes: r.sleep_minutes === null ? null : Number(r.sleep_minutes),
+      }));
+    const scores: ScoresView = { latest: history.at(-1) ?? null, history };
+
     const [insightRow] = await query<{
       generated_by: "claude" | "rules";
       model: string | null;
@@ -89,6 +123,7 @@ export async function getDashboard(): Promise<PersonView[]> {
       isCardiacPatient: p.is_cardiac_patient,
       periodEnd,
       metrics,
+      scores,
       worstFlag,
       insight: insightRow
         ? { ...insightRow.payload, generatedBy: insightRow.generated_by, model: insightRow.model }

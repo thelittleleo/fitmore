@@ -49,6 +49,21 @@ create table if not exists daily_summaries (
   primary key (person_id, metric, day)
 );
 
+-- WHOOP-style daily scores, derived from daily_summaries. Recovery is our own
+-- composite (HRV + resting HR + sleep + skin temp vs personal baseline); strain
+-- is a cardiovascular-load proxy; sleep_performance is achieved vs need.
+create table if not exists daily_scores (
+  person_id         text not null references persons(id),
+  day               date not null,
+  recovery          integer,                       -- 0..100, null before a baseline exists
+  recovery_band     text,                          -- 'green' | 'yellow' | 'red'
+  strain            double precision not null default 0,   -- 0..21
+  sleep_performance integer not null default 0,     -- percent of need
+  sleep_need        double precision,
+  sleep_minutes     double precision,
+  primary key (person_id, day)
+);
+
 -- Cached insight narratives. The dashboard reads these; page loads never call Claude.
 create table if not exists insights (
   id           bigserial primary key,

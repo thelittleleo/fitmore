@@ -23,6 +23,10 @@ interface MetricRoll {
 interface PersonRoll {
   person: { id: string; name: string; isCardiacPatient: boolean };
   periodEnd: string;
+  recovery: number | null;
+  recoveryBand: string | null;
+  strain: number | null;
+  sleepPerformance: number | null;
   metrics: MetricRoll[];
 }
 
@@ -75,7 +79,27 @@ async function buildRoll(personId: string): Promise<PersonRoll | null> {
       trend: last.trend,
     });
   }
-  return { person: { id: person.id, name: person.display_name, isCardiacPatient: person.is_cardiac_patient }, periodEnd, metrics };
+  const [sc] = await query<{
+    recovery: number | null;
+    recovery_band: string | null;
+    strain: number;
+    sleep_performance: number;
+  }>(
+    `select recovery, recovery_band, strain, sleep_performance
+     from daily_scores where person_id = $1 and recovery is not null
+     order by day desc limit 1`,
+    [personId],
+  );
+
+  return {
+    person: { id: person.id, name: person.display_name, isCardiacPatient: person.is_cardiac_patient },
+    periodEnd,
+    recovery: sc?.recovery ?? null,
+    recoveryBand: sc?.recovery_band ?? null,
+    strain: sc ? Number(sc.strain) : null,
+    sleepPerformance: sc?.sleep_performance ?? null,
+    metrics,
+  };
 }
 
 // ---- Rules-based narrative (the $0 floor) ------------------------------------
@@ -89,10 +113,21 @@ function rulesNarrative(roll: PersonRoll): InsightPayload {
     `${m.label} is ${m.trend === "flat" ? "steady" : m.trend === "up" ? "trending up" : "trending down"} ` +
     `(now ${formatValue(METRIC_BY_KEY[m.key], m.latest)}, 7-day avg ${m.avg7})`;
 
-  const observations = roll.metrics
-    .filter((m) => m.flag !== "normal" || m.trend !== "flat")
-    .slice(0, 5)
-    .map(trendPhrase);
+  const observations: string[] = [];
+  if (roll.recovery !== null) {
+    observations.push(
+      `Recovery ${roll.recovery}% (${roll.recoveryBand})` +
+        (roll.strain !== null ? `, day strain ${roll.strain.toFixed(1)}` : "") +
+        (roll.sleepPerformance !== null ? `, sleep ${roll.sleepPerformance}% of need` : "") +
+        ".",
+    );
+  }
+  observations.push(
+    ...roll.metrics
+      .filter((m) => m.flag !== "normal" || m.trend !== "flat")
+      .slice(0, 4)
+      .map(trendPhrase),
+  );
   if (observations.length === 0) {
     observations.push("All tracked metrics are within their usual range this week.");
   }
@@ -136,6 +171,8 @@ function rulesNarrative(roll: PersonRoll): InsightPayload {
 // ---- Claude narrative --------------------------------------------------------
 
 const SYSTEM_PROMPT = `You are Fitmore's health-data explainer. You receive a compact weekly summary of one person's wearable metrics (already aggregated — you never see raw data) and write a short, warm, plain-language readout.
+
+The summary may include a WHOOP-style recovery score (0-100, band green/yellow/red — a composite of HRV, resting HR, sleep and temperature vs the person's baseline), a day strain (0-21 cardiovascular load), and sleep performance (% of need). Lead with recovery when present, in plain language.
 
 Rules:
 - You are decision-support, NOT a doctor. Never diagnose, never prescribe.

@@ -1,6 +1,8 @@
 import { getDashboard } from "@/lib/dashboard";
 import type { PersonView } from "@/lib/types";
 import { MetricCharts } from "./components/MetricCharts";
+import { ScoreHero } from "./components/ScoreHero";
+import { RecoveryTrend } from "./components/RecoveryTrend";
 
 // Read-only, server-rendered shell. Reads cached summaries + insights from
 // Postgres — it never calls Claude, so it's fast and free on every load. The
@@ -18,6 +20,9 @@ function PersonSection({ p }: { p: PersonView }) {
         {p.isCardiacPatient && <span className="badge cardiac">cardiac</span>}
         {p.periodEnd && <span className="period">week ending {p.periodEnd}</span>}
       </div>
+
+      {p.scores.latest && <ScoreHero s={p.scores.latest} />}
+      {p.scores.history.length > 1 && <RecoveryTrend history={p.scores.history} />}
 
       {p.insight && (
         <div className="insight">
@@ -53,6 +58,7 @@ function PersonSection({ p }: { p: PersonView }) {
         </div>
       )}
 
+      <div className="section-title vitals-title">Vitals</div>
       <MetricCharts metrics={p.metrics} />
     </section>
   );
@@ -71,10 +77,10 @@ export default async function Home() {
     <>
       <header className="app-header">
         <div className="wrap">
-          <p className="eyebrow">Fitmore · M2 (mock data)</p>
+          <p className="eyebrow">Fitmore · M3 (mock data)</p>
           <h1>Personal health intelligence</h1>
           <p className="sub">
-            Synthetic Fitbit Air data → deterministic baselines → interactive charts + a weekly readout.
+            Recovery, strain &amp; sleep scores computed from synthetic Fitbit Air data — plus a weekly readout.
           </p>
         </div>
       </header>

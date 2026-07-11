@@ -75,12 +75,30 @@ export type InsightView = InsightPayload & {
   model: string | null;
 };
 
+export type RecoveryBand = "green" | "yellow" | "red";
+
+export interface ScoreDay {
+  day: string;
+  recovery: number | null; // 0..100
+  band: RecoveryBand | null;
+  strain: number; // 0..21
+  sleepPerformance: number; // percent of need
+  sleepNeed: number | null;
+  sleepMinutes: number | null;
+}
+
+export interface ScoresView {
+  latest: ScoreDay | null; // most recent day that has a recovery score
+  history: ScoreDay[]; // days with a recovery score, oldest → newest
+}
+
 export interface PersonView {
   id: string;
   name: string;
   isCardiacPatient: boolean;
   periodEnd: string | null;
   metrics: MetricView[];
+  scores: ScoresView;
   insight: InsightView | null;
   worstFlag: Flag;
 }
