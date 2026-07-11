@@ -1,0 +1,649 @@
+<title>Fitmore — Architecture</title>
+<style>
+  :root {
+    --ground: #F4F7F6;
+    --surface: #FFFFFF;
+    --surface-2: #ECF2F0;
+    --ink: #12211F;
+    --ink-soft: #4B5957;
+    --ink-faint: #7C8A88;
+    --line: #DBE4E2;
+    --line-strong: #C4D1CE;
+    --accent: #0E9B8A;
+    --accent-ink: #0A7264;
+    --accent-wash: #E4F2EF;
+    --ai: #B96F22;
+    --ai-ink: #9A5A17;
+    --ai-wash: #F6EBDA;
+    --alert: #CE3B37;
+    --alert-wash: #F8E4E3;
+    --shadow: 0 1px 2px rgba(18,33,31,.05), 0 8px 24px rgba(18,33,31,.06);
+
+    --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+    --maxw: 1080px;
+    --r: 12px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #0A1211;
+      --surface: #111B1A;
+      --surface-2: #16221F;
+      --ink: #E8EFED;
+      --ink-soft: #9DACA9;
+      --ink-faint: #6E7D7A;
+      --line: #23322F;
+      --line-strong: #2F413D;
+      --accent: #2FD4BF;
+      --accent-ink: #6FE8D8;
+      --accent-wash: #10302B;
+      --ai: #E1A25A;
+      --ai-ink: #F0C08A;
+      --ai-wash: #2C2013;
+      --alert: #F0605C;
+      --alert-wash: #331917;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"] {
+    --ground: #F4F7F6; --surface: #FFFFFF; --surface-2: #ECF2F0; --ink: #12211F;
+    --ink-soft: #4B5957; --ink-faint: #7C8A88; --line: #DBE4E2; --line-strong: #C4D1CE;
+    --accent: #0E9B8A; --accent-ink: #0A7264; --accent-wash: #E4F2EF;
+    --ai: #B96F22; --ai-ink: #9A5A17; --ai-wash: #F6EBDA;
+    --alert: #CE3B37; --alert-wash: #F8E4E3;
+    --shadow: 0 1px 2px rgba(18,33,31,.05), 0 8px 24px rgba(18,33,31,.06);
+  }
+  :root[data-theme="dark"] {
+    --ground: #0A1211; --surface: #111B1A; --surface-2: #16221F; --ink: #E8EFED;
+    --ink-soft: #9DACA9; --ink-faint: #6E7D7A; --line: #23322F; --line-strong: #2F413D;
+    --accent: #2FD4BF; --accent-ink: #6FE8D8; --accent-wash: #10302B;
+    --ai: #E1A25A; --ai-ink: #F0C08A; --ai-wash: #2C2013;
+    --alert: #F0605C; --alert-wash: #331917;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+  /* ---- header ---- */
+  header {
+    border-bottom: 1px solid var(--line);
+    background:
+      radial-gradient(120% 140% at 100% 0%, var(--accent-wash) 0%, transparent 55%),
+      var(--surface);
+  }
+  .head-inner { padding: 46px 24px 40px; max-width: var(--maxw); margin: 0 auto; }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .eyebrow::before {
+    content: ""; width: 26px; height: 2px; background: var(--accent); display: inline-block;
+  }
+  h1 {
+    font-size: clamp(28px, 4.4vw, 44px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin: 16px 0 10px;
+    text-wrap: balance;
+    font-weight: 680;
+  }
+  h1 .arrow { color: var(--ink-faint); font-weight: 400; }
+  .lede {
+    max-width: 60ch; color: var(--ink-soft); font-size: 17px; margin: 0 0 22px;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font-family: var(--font-mono); font-size: 12px; letter-spacing: .02em;
+    padding: 5px 11px; border: 1px solid var(--line-strong); border-radius: 999px;
+    color: var(--ink-soft); background: var(--surface);
+  }
+
+  /* ---- section scaffolding ---- */
+  section { padding: 52px 0; border-bottom: 1px solid var(--line); }
+  .sec-label {
+    font-family: var(--font-mono); font-size: 12px; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--ink-faint); margin: 0 0 6px;
+  }
+  h2 {
+    font-size: clamp(21px, 2.6vw, 27px); letter-spacing: -0.01em; margin: 0 0 6px;
+    font-weight: 640;
+  }
+  .sec-note { color: var(--ink-soft); max-width: 62ch; margin: 0 0 30px; }
+
+  /* ---- the stack diagram ---- */
+  .stack { display: flex; flex-direction: column; gap: 0; }
+  .tier {
+    --tier: var(--accent);
+    --tier-wash: var(--accent-wash);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--tier);
+    border-radius: var(--r);
+    box-shadow: var(--shadow);
+    display: grid;
+    grid-template-columns: 168px 1fr;
+    overflow: hidden;
+  }
+  .tier.ai { --tier: var(--ai); --tier-wash: var(--ai-wash); }
+  .tier.neutral { --tier: var(--line-strong); --tier-wash: var(--surface-2); }
+
+  .tier-rail {
+    background: var(--tier-wash);
+    padding: 18px 16px;
+    border-right: 1px solid var(--line);
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .tier-num {
+    font-family: var(--font-mono); font-size: 12px; color: var(--tier);
+    font-weight: 600;
+  }
+  .tier-name { font-weight: 650; font-size: 15px; letter-spacing: -0.01em; }
+  .tier-sub { font-size: 12.5px; color: var(--ink-soft); }
+
+  .tier-body {
+    padding: 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .node {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 13px 14px;
+    display: flex; flex-direction: column; gap: 8px;
+    transition: border-color .15s ease, transform .15s ease;
+  }
+  .node:hover { border-color: var(--tier); transform: translateY(-1px); }
+  .node.dashed { border-style: dashed; background: transparent; }
+  .node-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+  .node-name { font-weight: 620; font-size: 14.5px; letter-spacing: -0.01em; }
+  .node-type {
+    font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--tier);
+    background: var(--tier-wash); padding: 2px 7px; border-radius: 5px; white-space: nowrap;
+  }
+  .node ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
+  .node li {
+    font-size: 12.7px; color: var(--ink-soft); padding-left: 14px; position: relative; line-height: 1.4;
+  }
+  .node li::before {
+    content: ""; position: absolute; left: 2px; top: 8px; width: 4px; height: 4px;
+    border-radius: 50%; background: var(--tier); opacity: .65;
+  }
+  .later-tag {
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: .06em;
+    color: var(--ink-faint); border: 1px solid var(--line-strong); border-radius: 5px;
+    padding: 1px 6px; text-transform: uppercase;
+  }
+
+  /* connector between tiers */
+  .flow {
+    display: flex; align-items: center; gap: 12px;
+    padding: 9px 0 9px 84px;
+  }
+  .flow .glyph {
+    width: 22px; height: 22px; flex: none; border-radius: 50%;
+    border: 1px solid var(--line-strong); background: var(--surface);
+    display: grid; place-items: center; color: var(--ink-faint); font-size: 12px;
+  }
+  .flow .payload {
+    font-family: var(--font-mono); font-size: 12px; color: var(--ink-soft);
+  }
+  .flow .payload b { color: var(--ink); font-weight: 600; }
+
+  /* cross-cutting band */
+  .crosscut {
+    margin-top: 20px;
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--r);
+    background: repeating-linear-gradient(135deg, transparent, transparent 9px, var(--surface-2) 9px, var(--surface-2) 10px), var(--surface);
+    padding: 16px 18px;
+    display: grid; grid-template-columns: 168px 1fr; gap: 12px; align-items: center;
+  }
+  .crosscut .cc-title { display: flex; flex-direction: column; gap: 4px; }
+  .crosscut .cc-items { display: flex; flex-wrap: wrap; gap: 8px; }
+  .cc-item {
+    font-size: 12.5px; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 7px; padding: 6px 10px; color: var(--ink-soft);
+  }
+  .cc-item b { color: var(--ink); font-weight: 600; }
+
+  /* ---- pipeline steps ---- */
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; counter-reset: step; }
+  .step {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    padding: 16px 16px 16px 16px; position: relative;
+  }
+  .step .n {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--accent-ink);
+    background: var(--accent-wash); width: 26px; height: 26px; border-radius: 7px;
+    display: grid; place-items: center; margin-bottom: 10px;
+  }
+  .step h3 { margin: 0 0 5px; font-size: 14.5px; font-weight: 630; letter-spacing: -0.01em; }
+  .step p { margin: 0; font-size: 13px; color: var(--ink-soft); }
+  .step code { font-family: var(--font-mono); font-size: 12px; color: var(--accent-ink); background: var(--accent-wash); padding: 1px 5px; border-radius: 4px; }
+
+  /* ---- decisions ---- */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 18px; display: flex; flex-direction: column; gap: 8px; box-shadow: var(--shadow);
+  }
+  .card .tag {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .05em; text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .card h3 { margin: 0; font-size: 16px; font-weight: 640; letter-spacing: -0.01em; }
+  .card p { margin: 0; font-size: 13.5px; color: var(--ink-soft); }
+  .card.accent { border-top: 3px solid var(--accent); }
+  .card.ai-c { border-top: 3px solid var(--ai); }
+  .card.ai-c .tag { color: var(--ai-ink); }
+
+  /* ---- stack table ---- */
+  .table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+  table { border-collapse: collapse; width: 100%; min-width: 560px; background: var(--surface); }
+  th, td { text-align: left; padding: 13px 16px; font-size: 13.5px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  thead th {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--ink-faint); background: var(--surface-2); font-weight: 600;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td.pick { font-weight: 620; color: var(--ink); }
+  td .mono { font-family: var(--font-mono); font-size: 12px; color: var(--accent-ink); }
+
+  /* ---- roadmap ---- */
+  .road { display: flex; flex-direction: column; gap: 0; }
+  .milestone {
+    display: grid; grid-template-columns: 92px 1fr; gap: 18px; padding: 14px 0;
+    border-top: 1px solid var(--line); align-items: start;
+  }
+  .milestone:first-child { border-top: none; }
+  .milestone .m-id {
+    font-family: var(--font-mono); font-weight: 640; font-size: 13px; color: var(--accent-ink);
+    background: var(--accent-wash); border-radius: 7px; padding: 5px 0; text-align: center;
+  }
+  .milestone.future .m-id { color: var(--ink-faint); background: var(--surface-2); }
+  .milestone h3 { margin: 0 0 3px; font-size: 15px; font-weight: 630; }
+  .milestone p { margin: 0; font-size: 13.5px; color: var(--ink-soft); }
+
+  /* ---- safety note ---- */
+  .safety {
+    background: var(--alert-wash);
+    border: 1px solid color-mix(in srgb, var(--alert) 30%, transparent);
+    border-left: 3px solid var(--alert);
+    border-radius: 12px; padding: 18px 20px;
+    display: flex; gap: 14px; align-items: flex-start;
+  }
+  .safety .badge {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--alert); font-weight: 700; white-space: nowrap; padding-top: 2px;
+  }
+  .safety p { margin: 0; font-size: 13.8px; color: var(--ink); }
+  .safety p b { color: var(--alert); }
+
+  footer { padding: 34px 0 60px; color: var(--ink-faint); font-size: 12.5px; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; justify-content: space-between; }
+  footer .mono { font-family: var(--font-mono); }
+
+  a.focusable:focus-visible, .node:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @media (max-width: 620px) {
+    .tier, .crosscut { grid-template-columns: 1fr; }
+    .tier-rail { border-right: none; border-bottom: 1px solid var(--line); flex-direction: row; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+    .flow { padding-left: 20px; }
+    .milestone { grid-template-columns: 64px 1fr; gap: 12px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<header>
+  <div class="head-inner">
+    <div class="eyebrow">System Architecture · v0.1</div>
+    <h1>Personal health intelligence<br><span class="arrow">Fitbit&nbsp;Air&nbsp;→</span> Google&nbsp;Health&nbsp;API <span class="arrow">→</span> Claude</h1>
+    <p class="lede">A private web app that pulls your (and your mother's) Fitbit Air data, computes health baselines locally, and uses Claude to turn the numbers into plain-language insight. Built solo, personal-first, designed to open up later.</p>
+    <div class="chips">
+      <span class="chip">Web app</span>
+      <span class="chip">Next.js + TypeScript</span>
+      <span class="chip">Google Health API</span>
+      <span class="chip">Postgres</span>
+      <span class="chip">Claude API</span>
+      <span class="chip">2 users → many</span>
+    </div>
+  </div>
+</header>
+
+<section id="diagram">
+  <div class="wrap">
+    <p class="sec-label">The system</p>
+    <h2>Five layers, one direction of flow</h2>
+    <p class="sec-note">Data moves top to bottom. Each connector names the contract passed between layers — the seam you can test in isolation. The dashed adapter is what lets you bolt on a second device (a Huawei Watch D2 for blood pressure) later without rewriting anything above it.</p>
+
+    <div class="stack">
+
+      <!-- Layer 1 -->
+      <div class="tier">
+        <div class="tier-rail">
+          <span class="tier-num">L1</span>
+          <span class="tier-name">Source</span>
+          <span class="tier-sub">Wearable sensors</span>
+        </div>
+        <div class="tier-body">
+          <div class="node" tabindex="0">
+            <div class="node-top"><span class="node-name">Fitbit Air</span><span class="node-type">Device</span></div>
+            <ul>
+              <li>24/7 heart rate · HRV · resting HR</li>
+              <li>SpO₂ · skin temperature</li>
+              <li>Sleep stages · steps · active zone min</li>
+              <li>Syncs to Google Health app over BLE</li>
+            </ul>
+          </div>
+          <div class="node dashed" tabindex="0">
+            <div class="node-top"><span class="node-name">Huawei Watch&nbsp;D2</span><span class="later-tag">Phase 5</span></div>
+            <ul>
+              <li>Cuff-grade blood pressure for your mother</li>
+              <li>Enters via its own adapter (L2)</li>
+              <li>Not purchased yet — reserved slot</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow"><span class="glyph">↓</span><span class="payload"><b>Encrypted BLE</b> → Fitbit cloud (you never touch the raw radio)</span></div>
+
+      <!-- Layer 2 -->
+      <div class="tier">
+        <div class="tier-rail">
+          <span class="tier-num">L2</span>
+          <span class="tier-name">Ingestion</span>
+          <span class="tier-sub">Auth · fetch · normalize</span>
+        </div>
+        <div class="tier-body">
+          <div class="node" tabindex="0">
+            <div class="node-top"><span class="node-name">Google Health API</span><span class="node-type">SaaS · REST</span></div>
+            <ul>
+              <li>Google OAuth 2.0 — per-account consent</li>
+              <li>Intraday data open by default (no tier gate)</li>
+              <li>~150 requests / hour / user</li>
+            </ul>
+          </div>
+          <div class="node" tabindex="0">
+            <div class="node-top"><span class="node-name">Sync worker</span><span class="node-type">Cron + webhook</span></div>
+            <ul>
+              <li>Webhook receiver for pushed updates</li>
+              <li>Scheduled backfill within rate limit</li>
+              <li>Encrypted refresh-token vault</li>
+            </ul>
+          </div>
+          <div class="node" tabindex="0">
+            <div class="node-top"><span class="node-name">Normalization adapter</span><span class="node-type">Anti-corruption</span></div>
+            <ul>
+              <li>Maps vendor payloads → canonical schema</li>
+              <li>One interface per source (Fitbit, Huawei…)</li>
+              <li>Isolates the app from API changes</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow"><span class="glyph">↓</span><span class="payload"><b>Canonical samples</b> — {user, metric, value, unit, ts, source}</span></div>
+
+      <!-- Layer 3 -->
+      <div class="tier">
+        <div class="tier-rail">
+          <span class="tier-num">L3</span>
+          <span class="tier-name">Storage</span>
+          <span class="tier-sub">System of record</span>
+        </div>
+        <div class="tier-body">
+          <div class="node" tabindex="0">
+            <div class="node-top"><span class="node-name">Postgres</span><span class="node-type">Relational</span></div>
+            <ul>
+              <li><span style="font-family:var(--font-mono);font-size:12px">raw_samples</span> — time-series metrics</li>
+              <li><span style="font-family:var(--font-mono);font-size:12px">daily_summaries</span> — rollups & baselines</li>
+              <li><span style="font-family:var(--font-mono);font-size:12px">insights</span> — cached Claude output</li>
+              <li><span style="font-family:var(--font-mono);font-size:12px">accounts</span> — users, tokens, consent</li>
+            </ul>
+          </div>
+          <div class="node" tabindex="0">
+            <div class="node-top"><span class="node-name">Object cache</span><span class="node-type">Optional</span></div>
+            <ul>
+              <li>Hot dashboard aggregates</li>
+              <li>Dedupe webhook bursts</li>
+              <li>Add only when volume demands it</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow"><span class="glyph">↓</span><span class="payload"><b>Aggregates</b> read by the processing layer — never the raw firehose</span></div>
+
+      <!-- Layer 4 -->
+      <div class="tier ai">
+        <div class="tier-rail">
+          <span class="tier-num">L4</span>
+          <span class="tier-name">Processing</span>
+          <span class="tier-sub">Numbers → meaning</span>
+        </div>
+        <div class="tier-body">
+          <div class="node" tabindex="0">
+            <div class="node-top"><span class="node-name">Deterministic engine</span><span class="node-type">Your code</span></div>
+            <ul>
+              <li>Rolling averages · resting-HR trend</li>
+              <li>HRV baseline & deviation · sleep debt</li>
+              <li>Rule-based anomaly flags (cheap, exact)</li>
+            </ul>
+          </div>
+          <div class="node" tabindex="0">
+            <div class="node-top"><span class="node-name">Claude insight engine</span><span class="node-type">LLM · Messages</span></div>
+            <ul>
+              <li>Reads pre-computed summaries, not raw data</li>
+              <li>Cross-metric narrative + weekly readout</li>
+              <li>Prompt caching on the stable system prompt</li>
+              <li>Runs on schedule → output cached in L3</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow"><span class="glyph">↓</span><span class="payload"><b>Insight JSON</b> — narrative, trend verdicts, flags (persisted, not live-generated)</span></div>
+
+      <!-- Layer 5 -->
+      <div class="tier neutral">
+        <div class="tier-rail">
+          <span class="tier-num">L5</span>
+          <span class="tier-name">Presentation</span>
+          <span class="tier-sub">What you actually open</span>
+        </div>
+        <div class="tier-body">
+          <div class="node" tabindex="0">
+            <div class="node-top"><span class="node-name">Web dashboard</span><span class="node-type">Next.js · React</span></div>
+            <ul>
+              <li>Per-person views — “You” / “Mum”</li>
+              <li>Trend charts + Claude insight cards</li>
+              <li>Anomaly & attention banners</li>
+            </ul>
+          </div>
+          <div class="node" tabindex="0">
+            <div class="node-top"><span class="node-name">App API</span><span class="node-type">Route handlers</span></div>
+            <ul>
+              <li>Serves cached summaries + insights</li>
+              <li>Holds all secrets server-side</li>
+              <li>Session auth to your app</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="crosscut">
+      <div class="cc-title">
+        <span class="tier-num" style="color:var(--ink-soft)">C0</span>
+        <span class="tier-name">Cross-cutting</span>
+        <span class="tier-sub">Applies to every layer</span>
+      </div>
+      <div class="cc-items">
+        <span class="cc-item"><b>Consent gate</b> before any data reaches Claude</span>
+        <span class="cc-item"><b>Tokens encrypted</b> at rest</span>
+        <span class="cc-item"><b>HTTPS</b> end to end</span>
+        <span class="cc-item"><b>Claude key</b> server-side only</span>
+        <span class="cc-item"><b>Audit log</b> of data access</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flow">
+  <div class="wrap">
+    <p class="sec-label">Data flow</p>
+    <h2>One sample's journey, end to end</h2>
+    <p class="sec-note">The order is the contract — each step hands a well-defined payload to the next, so you can build and test them one at a time.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="n">1</div>
+        <h3>Connect</h3>
+        <p>You authorize your Fitbit account once via Google OAuth. The backend stores an encrypted <code>refresh_token</code>.</p>
+      </div>
+      <div class="step">
+        <div class="n">2</div>
+        <h3>Ingest</h3>
+        <p>A webhook (or scheduled pull) fetches new samples. The adapter normalizes them into one canonical shape.</p>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <h3>Store</h3>
+        <p>Samples land in <code>raw_samples</code>. Nothing is analyzed yet — this layer is just the durable record.</p>
+      </div>
+      <div class="step">
+        <div class="n">4</div>
+        <h3>Summarize</h3>
+        <p>A nightly job computes rollups, baselines, and anomaly flags into <code>daily_summaries</code>.</p>
+      </div>
+      <div class="step">
+        <div class="n">5</div>
+        <h3>Interpret</h3>
+        <p>A weekly job sends the summaries — not raw data — to Claude and caches the narrative into <code>insights</code>.</p>
+      </div>
+      <div class="step">
+        <div class="n">6</div>
+        <h3>Render</h3>
+        <p>The dashboard reads cached summaries and insights. Page loads never call Claude, so they're fast and free.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="decisions">
+  <div class="wrap">
+    <p class="sec-label">Design decisions</p>
+    <h2>The four calls that shape everything</h2>
+    <div class="cards">
+      <div class="card ai-c">
+        <span class="tag">Cost & quality</span>
+        <h3>Aggregate before you ask Claude</h3>
+        <p>Never stream the raw firehose to the model. Pre-compute summaries in your own code, then ask Claude to interpret them. Cheaper tokens, sharper answers, deterministic math stays deterministic.</p>
+      </div>
+      <div class="card accent">
+        <span class="tag">Extensibility</span>
+        <h3>A normalization adapter per source</h3>
+        <p>Everything above L2 speaks one canonical schema. Adding the Huawei Watch D2 for blood pressure later is a new adapter, not a rewrite. This one boundary is what protects the whole app.</p>
+      </div>
+      <div class="card accent">
+        <span class="tag">Access model</span>
+        <h3>Personal now, reviewed later</h3>
+        <p>For you + your mother, a personal app gives full, free access including intraday data. Opening it to strangers means Google's app review and stricter rate-limit handling — a gate, not a paywall.</p>
+      </div>
+      <div class="card ai-c">
+        <span class="tag">Caching</span>
+        <h3>Insights are persisted, not live</h3>
+        <p>Claude runs on a schedule and writes to the database. The UI reads that cache. This is what keeps a “free for everyone” version from quietly running up an API bill on every page view.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="stack">
+  <div class="wrap">
+    <p class="sec-label">Recommended stack</p>
+    <h2>Solo-friendly, boring on purpose</h2>
+    <p class="sec-note">Every pick optimizes for one person shipping and maintaining this without a team. Swap freely — the layers, not the vendors, are the architecture.</p>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Layer</th><th>Pick</th><th>Why this one</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Frontend + API</td><td class="pick">Next.js (TypeScript)</td><td>One codebase for UI and backend route handlers. Easy deploy, easy for a solo dev.</td></tr>
+          <tr><td>Database</td><td class="pick">Postgres <span class="mono">(Supabase / Neon)</span></td><td>Relational fits summaries + consent; Supabase throws in auth & row-level security for free.</td></tr>
+          <tr><td>Scheduling</td><td class="pick">Cron worker</td><td>Nightly summaries + weekly insights. Vercel Cron or a tiny always-on worker.</td></tr>
+          <tr><td>Ingestion</td><td class="pick">Google Health API</td><td>The sanctioned Fitbit successor. OAuth 2.0, webhooks, intraday included.</td></tr>
+          <tr><td>Insight</td><td class="pick">Claude API <span class="mono">(Messages)</span></td><td>Structured summaries in, narrative out. Prompt caching to cut cost.</td></tr>
+          <tr><td>Charts</td><td class="pick">Recharts / visx</td><td>React-native charting for HR, sleep, HRV, SpO₂ trends.</td></tr>
+          <tr><td>Hosting</td><td class="pick">Vercel + managed PG</td><td>Zero-ops for a solo project; move to a VPS only if you want full control.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="roadmap">
+  <div class="wrap">
+    <p class="sec-label">Build order</p>
+    <h2>Ship a thin slice, then widen it</h2>
+    <p class="sec-note">Each milestone is usable on its own. Don't build L4 before L1 works end to end for a single metric.</p>
+    <div class="road">
+      <div class="milestone">
+        <div class="m-id">M1</div>
+        <div><h3>OAuth + one metric, end to end</h3><p>Connect your own Fitbit Air, pull heart rate, store it, show a raw chart. Proves the whole pipe.</p></div>
+      </div>
+      <div class="milestone">
+        <div class="m-id">M2</div>
+        <div><h3>Summaries + full dashboard</h3><p>Nightly rollups and baselines for both people; charts for HR, sleep, HRV, SpO₂, steps, temperature.</p></div>
+      </div>
+      <div class="milestone">
+        <div class="m-id">M3</div>
+        <div><h3>Claude weekly readout</h3><p>Scheduled insight generation, cached to the database, surfaced as cards. Your first “gold.”</p></div>
+      </div>
+      <div class="milestone">
+        <div class="m-id">M4</div>
+        <div><h3>Near-real-time + alerts</h3><p>Webhook ingestion and anomaly banners — resting-HR creep, SpO₂ dips, HRV drops worth a look.</p></div>
+      </div>
+      <div class="milestone future">
+        <div class="m-id">M5</div>
+        <div><h3>Add BP source · open to others</h3><p>Plug in a Huawei Watch D2 adapter for cuff-grade blood pressure, then take it through Google's review to share.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="safety" style="border-bottom:none">
+  <div class="wrap">
+    <div class="safety">
+      <span class="badge">Cardiac care</span>
+      <p>Your mother is a post-bypass patient, so treat this app as <b>tracking and decision-support, never diagnosis</b>. Anomaly flags prompt a conversation with her cardiologist — they don't replace one. And when blood pressure enters the picture, use only a validated cuff device (the Watch D2), never an optical PPG estimate, for any number she or her doctor might act on.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span class="mono">Fitmore · architecture v0.1</span>
+    <span>Data top-down · adapters keep it swappable · Claude interprets, your code measures</span>
+  </div>
+</footer>

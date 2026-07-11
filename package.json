@@ -1,0 +1,35 @@
+{
+  "name": "fitmore",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Personal health intelligence — Fitbit Air data into Claude-generated insights",
+  "scripts": {
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:migrate": "tsx src/scripts/migrate.ts",
+    "seed": "tsx src/scripts/seed.ts",
+    "summarize": "tsx src/scripts/run-summaries.ts",
+    "insight": "tsx src/scripts/run-insights.ts",
+    "pipeline": "tsx src/scripts/pipeline.ts",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.68.0",
+    "dotenv": "^17.0.0",
+    "next": "^15.3.0",
+    "pg": "^8.13.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "recharts": "^3.9.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/pg": "^8.11.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}

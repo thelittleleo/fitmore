@@ -1,0 +1,23 @@
+services:
+  db:
+    image: postgres:16
+    container_name: fitmore-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: fitmore
+      POSTGRES_PASSWORD: fitmore
+      POSTGRES_DB: fitmore
+    ports:
+      # Host port is configurable so it won't clash with a Postgres you already
+      # run on 5432. Override with DB_PORT in .env (compose reads it automatically).
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - fitmore-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fitmore -d fitmore"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  fitmore-pgdata:
