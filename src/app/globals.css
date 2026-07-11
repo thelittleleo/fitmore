@@ -9,19 +9,28 @@
   --accent: #0e9b8a;
   --accent-wash: #e4f2ef;
 
-  --good: #0e9b8a;
-  --warn: #b5730f;
-  --bad: #ce3b37;
-  --good-wash: #e4f2ef;
-  --warn-wash: #f8efdc;
-  --bad-wash: #f8e4e3;
+  /* Status — vivid FILLS (rings, bars, dots, borders); distinct from the teal
+     accent so "recovered/green" reads as green, not brand. Validated: status
+     green↔yellow↔red separate at ΔE 25–32 under CVD. */
+  --good: #16a34a;
+  --warn: #eab308;
+  --bad: #dc2f2f;
+  /* Status — readable TEXT inks (pills, tooltip flags, labels), all ≥3:1 on white. */
+  --good-ink: #0f7a37;
+  --warn-ink: #8a5e00;
+  --bad-ink: #c22626;
+  --good-wash: #e6f5ec;
+  --warn-wash: #faf1d3;
+  --bad-wash: #fbe7e6;
 
-  --spark-normal: #4ba99b;
-  --spark-watch: #cf9433;
-  --spark-alert: #d6564f;
+  --spark-normal: #16a34a;
+  --spark-watch: #eab308;
+  --spark-alert: #dc2f2f;
 
-  --strain: #2f6fed;
-  --sleep: #7c5cd6;
+  /* Strain / sleep hues. Blue↔purple are inherently CVD-close, so each ring is
+     always caption-labeled — color never carries identity alone. */
+  --strain: #2563eb;
+  --sleep: #7c3aed;
 
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -39,19 +48,22 @@
     --accent: #2fd4bf;
     --accent-wash: #10302b;
 
-    --good: #2fd4bf;
-    --warn: #e0a45c;
+    --good: #22c55e;
+    --warn: #eab308;
     --bad: #f0605c;
-    --good-wash: #10302b;
-    --warn-wash: #2c2013;
+    --good-ink: #4ade80;
+    --warn-ink: #f5c451;
+    --bad-ink: #f87171;
+    --good-wash: #10301f;
+    --warn-wash: #2c2510;
     --bad-wash: #331917;
 
-    --spark-normal: #2fd4bf;
-    --spark-watch: #e0a45c;
+    --spark-normal: #22c55e;
+    --spark-watch: #eab308;
     --spark-alert: #f0605c;
 
     --strain: #6ea8ff;
-    --sleep: #a992f0;
+    --sleep: #a78bfa;
   }
 }
 
@@ -101,7 +113,7 @@ main .wrap { padding-top: 30px; padding-bottom: 60px; }
   font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 999px;
   border: 1px solid var(--line);
 }
-.badge.cardiac { color: var(--bad); background: var(--bad-wash); border-color: color-mix(in srgb, var(--bad) 30%, transparent); }
+.badge.cardiac { color: var(--bad-ink); background: var(--bad-wash); border-color: color-mix(in srgb, var(--bad) 30%, transparent); }
 
 .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
 .status-normal { background: var(--good); }
@@ -122,7 +134,7 @@ main .wrap { padding-top: 30px; padding-bottom: 60px; }
 .person-tabs .status-dot { width: 8px; height: 8px; }
 .tab-cardiac {
   font-size: 9.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
-  color: var(--bad); background: var(--bad-wash); padding: 1px 5px; border-radius: 4px;
+  color: var(--bad-ink); background: var(--bad-wash); padding: 1px 5px; border-radius: 4px;
 }
 
 /* Score hero (WHOOP-style rings) */
@@ -151,6 +163,24 @@ main .wrap { padding-top: 30px; padding-bottom: 60px; }
 .hero-title { font-size: 14px; font-weight: 650; margin-top: 8px; }
 .hero-sub { font-size: 11.5px; color: var(--ink-faint); max-width: 24ch; }
 
+/* Week-over-week delta */
+.delta { font-size: 11px; font-weight: 600; margin-top: 3px; }
+.delta.flat { color: var(--ink-faint); font-weight: 500; }
+.delta.up-good { color: var(--good-ink); }
+.delta.down-bad { color: var(--bad-ink); }
+.delta.neutral { color: var(--ink-soft); }
+
+/* Recovery driver breakdown (what's moving today's score) */
+.drivers { width: 100%; margin-top: 13px; display: flex; flex-direction: column; gap: 6px; }
+.driver { display: grid; grid-template-columns: 68px 1fr; align-items: center; gap: 8px; }
+.driver-label { font-size: 11px; color: var(--ink-soft); text-align: left; }
+.driver-track { height: 6px; border-radius: 3px; background: var(--surface-2); overflow: hidden; }
+.driver-fill { display: block; height: 100%; border-radius: 3px; }
+
+/* Subtle card hover */
+.hero-metric, .chart-card, .trend-card { transition: border-color 0.15s ease; }
+.chart-card:hover { border-color: color-mix(in srgb, var(--accent) 32%, var(--line)); }
+
 /* Section titles + recovery trend card */
 .section-title {
   font-size: 11px; font-family: var(--font-mono); letter-spacing: 0.12em;
@@ -164,9 +194,9 @@ main .wrap { padding-top: 30px; padding-bottom: 60px; }
 .trend-card .section-title { margin-bottom: 4px; }
 
 /* Recovery-band colors inside the chart tooltip */
-.chart-tip .tip-flag.green { color: var(--good); }
-.chart-tip .tip-flag.yellow { color: var(--warn); }
-.chart-tip .tip-flag.red { color: var(--bad); }
+.chart-tip .tip-flag.green { color: var(--good-ink); }
+.chart-tip .tip-flag.yellow { color: var(--warn-ink); }
+.chart-tip .tip-flag.red { color: var(--bad-ink); }
 
 @media (max-width: 560px) {
   .hero { grid-template-columns: 1fr; }
@@ -226,9 +256,9 @@ main .wrap { padding-top: 30px; padding-bottom: 60px; }
   font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
   padding: 2px 7px; border-radius: 5px;
 }
-.pill.normal { color: var(--good); background: var(--good-wash); }
-.pill.watch { color: var(--warn); background: var(--warn-wash); }
-.pill.alert { color: var(--bad); background: var(--bad-wash); }
+.pill.normal { color: var(--good-ink); background: var(--good-wash); }
+.pill.watch { color: var(--warn-ink); background: var(--warn-wash); }
+.pill.alert { color: var(--bad-ink); background: var(--bad-wash); }
 
 .trend { font-size: 12px; color: var(--ink-faint); font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; gap: 3px; }
 
@@ -241,8 +271,8 @@ main .wrap { padding-top: 30px; padding-bottom: 60px; }
 .chart-tip .tip-val { font-weight: 650; font-variant-numeric: tabular-nums; }
 .chart-tip .tip-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 3px; color: var(--ink-soft); }
 .chart-tip .tip-flag { text-transform: uppercase; font-weight: 700; font-size: 10px; letter-spacing: 0.04em; }
-.chart-tip .tip-flag.watch { color: var(--warn); }
-.chart-tip .tip-flag.alert { color: var(--bad); }
+.chart-tip .tip-flag.watch { color: var(--warn-ink); }
+.chart-tip .tip-flag.alert { color: var(--bad-ink); }
 
 /* Safety footer */
 .safety {
@@ -253,7 +283,7 @@ main .wrap { padding-top: 30px; padding-bottom: 60px; }
 }
 .safety .badge-text {
   font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em;
-  text-transform: uppercase; color: var(--bad); font-weight: 700; white-space: nowrap; padding-top: 2px;
+  text-transform: uppercase; color: var(--bad-ink); font-weight: 700; white-space: nowrap; padding-top: 2px;
 }
 .safety p { margin: 0; font-size: 13.5px; color: var(--ink); }
 

@@ -20,7 +20,7 @@ function PersonSection({ p }: { p: PersonView }) {
         {p.periodEnd && <span className="period">week ending {p.periodEnd}</span>}
       </div>
 
-      {p.scores.latest && <ScoreHero s={p.scores.latest} />}
+      {p.scores.latest && <ScoreHero scores={p.scores} />}
       {p.scores.history.length > 1 && <RecoveryTrend history={p.scores.history} />}
 
       {p.insight && (

@@ -87,9 +87,16 @@ export interface ScoreDay {
   sleepMinutes: number | null;
 }
 
+export interface RecoveryDrivers {
+  hrv: number; // 0..100 contribution to today's recovery
+  rhr: number;
+  sleep: number;
+}
+
 export interface ScoresView {
   latest: ScoreDay | null; // most recent day that has a recovery score
   history: ScoreDay[]; // days with a recovery score, oldest → newest
+  drivers: RecoveryDrivers | null; // what's driving the latest recovery score
 }
 
 export interface PersonView {

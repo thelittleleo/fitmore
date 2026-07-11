@@ -12,7 +12,7 @@ const clamp = (x: number, lo = 0, hi = 1) => Math.max(lo, Math.min(hi, x));
 // Map a z-score to 0..1 where 1 = best. `good` says which direction is healthy.
 // Being *at* your own baseline is healthy, so z = 0 lands high (~0.72), not 0.5;
 // each standard deviation above/below your norm moves it ±0.22.
-function fromZ(z: number, good: "high" | "low"): number {
+export function fromZ(z: number, good: "high" | "low"): number {
   const s = good === "high" ? z : -z; // higher-is-better vs lower-is-better
   return clamp(0.72 + s * 0.22); // z = 0 → 0.72, z = +1.3 → 1.0, z = -2 → 0.28
 }

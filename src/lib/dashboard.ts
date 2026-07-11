@@ -1,4 +1,5 @@
 import { query } from "./db";
+import { fromZ } from "@/engine/scores";
 import { METRICS, type MetricKey, type Flag, type Trend } from "./metrics";
 import type {
   ChartPoint,
@@ -6,9 +7,12 @@ import type {
   MetricView,
   PersonView,
   RecoveryBand,
+  RecoveryDrivers,
   ScoreDay,
   ScoresView,
 } from "./types";
+
+const clamp100 = (x: number) => Math.max(0, Math.min(100, Math.round(x)));
 
 export type { MetricView, PersonView } from "./types";
 
@@ -105,7 +109,20 @@ export async function getDashboard(): Promise<PersonView[]> {
         sleepNeed: r.sleep_need === null ? null : Number(r.sleep_need),
         sleepMinutes: r.sleep_minutes === null ? null : Number(r.sleep_minutes),
       }));
-    const scores: ScoresView = { latest: history.at(-1) ?? null, history };
+    // What's driving today's recovery: the HRV and resting-HR components (same
+    // fromZ the scores engine uses) plus sleep performance, as 0..100 bars.
+    const latestScore = history.at(-1) ?? null;
+    const hrvZ = byMetric.get("hrv")?.at(-1)?.z ?? null;
+    const rhrZ = byMetric.get("resting_hr")?.at(-1)?.z ?? null;
+    let drivers: RecoveryDrivers | null = null;
+    if (latestScore && hrvZ !== null && rhrZ !== null) {
+      drivers = {
+        hrv: clamp100(100 * fromZ(Number(hrvZ), "high")),
+        rhr: clamp100(100 * fromZ(Number(rhrZ), "low")),
+        sleep: clamp100(latestScore.sleepPerformance),
+      };
+    }
+    const scores: ScoresView = { latest: latestScore, history, drivers };
 
     const [insightRow] = await query<{
       generated_by: "claude" | "rules";
